@@ -1,0 +1,9 @@
+parameters:
+  page_media_set.thumbnail_indexer_listener.class: ArsThanea\PageMediaSetBundle\EventListener\ThumbnailIndexerListener
+
+services:
+  page_media_set.thumbnail_indexer_listener:
+    class: %page_media_set.thumbnail_indexer_listener%
+    arguments: [ @page_media_set.page_media_set_service ]
+    tags:
+      - { name: kernel.event_listener, event: kunstmaan_node_search.onIndexNode, method: onIndexNode, priority: 100 }

@@ -1,7 +1,7 @@
 {
   "name": "arsthanea/page-media-set-bundle",
   "require": {
-    "kunstmaan/bundles-cms": "~3.2,<3.5",
+    "kunstmaan/bundles-cms": "~3.5",
     "friendsofsymfony/user-bundle": "2.0.*@dev",
     "kunstmaan/media-bundle": "~3.2"
   },

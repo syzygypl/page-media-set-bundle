@@ -4,8 +4,10 @@ namespace ArsThanea\PageMediaSetBundle\Form;
 
 use ArsThanea\PageMediaSetBundle\Entity\PageMedia;
 use ArsThanea\PageMediaSetBundle\Service\FormatRepository;
+use Kunstmaan\MediaBundle\Form\Type\MediaType;
 use Kunstmaan\MediaBundle\Validator\Constraints\Media;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -26,7 +28,7 @@ class PageMediaAdminType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('media', 'media', [
+        $builder->add('media', MediaType::class, [
             'pattern'   => 'KunstmaanMediaBundle_chooser',
             'mediatype' => 'image',
             'required'  => true,
@@ -42,7 +44,7 @@ class PageMediaAdminType extends AbstractType
             $form = $event->getForm();
 
             if (null === $data) {
-                $form->add('type', 'choice', [
+                $form->add('type', ChoiceType::class, [
                     'choices' => $mediaTypes,
                 ]);
 
@@ -63,7 +65,7 @@ class PageMediaAdminType extends AbstractType
                     'maxHeight' => $format->getMaxHeight(),
                 ])] : [],
             ];
-            $form->add('media', 'media', $options + $builder->get('media')->getOptions());
+            $form->add('media', $builder->get('media')->getType()->getName(), $options + $builder->get('media')->getOptions());
 
         });
     }
@@ -85,7 +87,7 @@ class PageMediaAdminType extends AbstractType
      *
      * @return string The name of this type
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'page_media';
     }

@@ -29,7 +29,7 @@ class PageMediaCollectionAdminType extends AbstractType
             'label'        => false,
             'allow_delete' => true,
             'allow_add'    => false,
-            'type'         => 'page_media',
+            'type'         => PageMediaAdminType::class,
             'options'      => [
                 'media_types' => $this->page->getMediaSetDefinition(),
             ],
@@ -73,7 +73,7 @@ class PageMediaCollectionAdminType extends AbstractType
      *
      * @return string The name of this type
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'page_media_collection';
     }

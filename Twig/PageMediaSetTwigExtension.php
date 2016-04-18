@@ -20,16 +20,18 @@ class PageMediaSetTwigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'page_media' => new \Twig_SimpleFunction('page_media', function ($page, $type = null) {
-                if ($page instanceof HasMediaSetInterface) {
-                    return $this->mediaSetService->getPageMedia($page, $type) ?: "";
-                }
-
-                return "";
-            }),
+            'page_media' => new \Twig_SimpleFunction('page_media', [$this, 'getPageMedia']),
         ];
     }
 
+    public function getPageMedia($page, $type = null)
+    {
+        if ($page instanceof HasMediaSetInterface) {
+            return $this->mediaSetService->getPageMedia($page, $type) ? : "";
+        }
+
+        return "";
+    }
 
     /**
      * Returns the name of the extension.

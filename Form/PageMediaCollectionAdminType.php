@@ -4,6 +4,7 @@ namespace ArsThanea\PageMediaSetBundle\Form;
 
 use ArsThanea\PageMediaSetBundle\Entity\PageMedia;
 use ArsThanea\PageMediaSetBundle\Service\HasMediaSetInterface;
+use ArsThanea\PageMediaSetBundle\Service\HasRichMediaInterface;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -32,6 +33,7 @@ class PageMediaCollectionAdminType extends AbstractType
             'type'         => PageMediaAdminType::class,
             'options'      => [
                 'media_types' => $this->page->getMediaSetDefinition(),
+                'images_only' => false === $this->page instanceof HasRichMediaInterface
             ],
             'attr'         => [
                 'nested_form' => true,

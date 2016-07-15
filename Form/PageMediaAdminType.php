@@ -30,7 +30,7 @@ class PageMediaAdminType extends AbstractType
     {
         $builder->add('media', MediaType::class, [
             'pattern'   => 'KunstmaanMediaBundle_chooser',
-            'mediatype' => 'image',
+            'mediatype' => $options['images_only'] ? 'image' : null,
             'required'  => true,
         ]);
 
@@ -73,7 +73,8 @@ class PageMediaAdminType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => PageMedia::class
+            'data_class' => PageMedia::class,
+            'images_only' => true,
         ]);
         $resolver->setRequired(['media_types']);
         $resolver->setAllowedTypes([

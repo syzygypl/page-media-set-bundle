@@ -2,7 +2,7 @@
 
 namespace ArsThanea\PageMediaSetBundle\Service;
 
-class HasRichMediaInterface
+interface HasRichMediaInterface extends HasMediaSetInterface
 {
 
 }

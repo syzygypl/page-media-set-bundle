@@ -24,6 +24,12 @@ class Configuration implements ConfigurationInterface
 
         $rootNode->children()->booleanNode('indexer')->defaultFalse();
 
+        /** @var ArrayNodeDefinition $types */
+        $types = $rootNode->children()->arrayNode('types');
+        $types->defaultValue([]);
+        $types = $types->prototype('array');
+        $types->prototype('scalar');
+
         $formats = $rootNode->children()->arrayNode('formats');
         $formats->isRequired();
         $formats->requiresAtLeastOneElement();

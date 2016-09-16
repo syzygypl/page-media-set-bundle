@@ -32,6 +32,8 @@ class PageMediaSetExtension extends Extension
             $loader->load('indexer.yml');
         }
 
+        $container->setParameter('page_media_set.types', $configs['types']);
+
         $repository = $container->getDefinition('page_media_set.format_repository');
         foreach ($configs['formats'] as $name => $format) {
             $id = 'page_media_set.format.' . $name;

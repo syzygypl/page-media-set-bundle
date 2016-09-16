@@ -62,6 +62,18 @@ page_media_set:
 
 You need to configure all your media types, but the constraints are optional. 
 
+### Predefined media set types
+
+You can configure the media set definitions using symfony config, instead of returning them using the `getMediaSetDefinition` method.
+
+```yaml
+# app/config/config.yml
+page_media_set:
+  types:
+    'Acme\Foo\Bar\BazEntity': [ 'foo', 'bar' ]
+```
+
+In this case `Acme\Foo\Bar\BazEntity::getMediaSetDefinition()` won’t be called, `foo` and `bar` formats will be used.
 
 ### Format names
 

@@ -4,6 +4,7 @@ namespace ArsThanea\PageMediaSetBundle\Form;
 
 use ArsThanea\PageMediaSetBundle\Entity\PageMedia;
 use ArsThanea\PageMediaSetBundle\Service\HasMediaSetInterface;
+use ArsThanea\PageMediaSetBundle\Service\MediaSetDefinitionInterface;
 use ArsThanea\PageMediaSetBundle\Service\HasRichMediaInterface;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\AbstractType;
@@ -19,9 +20,15 @@ class PageMediaCollectionAdminType extends AbstractType
      */
     private $page;
 
-    public function __construct(HasMediaSetInterface $page)
+    /**
+     * @var MediaSetDefinitionInterface
+     */
+    private $mediaSetDefinition;
+
+    public function __construct(HasMediaSetInterface $page, MediaSetDefinitionInterface $mediaSetDefinition)
     {
         $this->page = $page;
+        $this->mediaSetDefinition = $mediaSetDefinition;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -32,7 +39,7 @@ class PageMediaCollectionAdminType extends AbstractType
             'allow_add'    => false,
             'type'         => PageMediaAdminType::class,
             'options'      => [
-                'media_types' => $this->page->getMediaSetDefinition(),
+                'media_types' => $this->mediaSetDefinition->getMediaSetDefinition($this->page),
                 'images_only' => false === $this->page instanceof HasRichMediaInterface
             ],
             'attr'         => [
@@ -44,11 +51,13 @@ class PageMediaCollectionAdminType extends AbstractType
             /** @var Collection $data */
             $data = $event->getData();
 
+            $mediaSet = $this->mediaSetDefinition->getMediaSetDefinition($this->page);
+
             $types = array_map(function ($type) use ($data) {
                 return $data->filter(function (PageMedia $element) use ($type) {
                     return $type === $element->getType();
                 })->first() ? : (new PageMedia)->setType($type)->setPageId($this->page->getId())->setPageType($this->page->getType());
-            }, array_combine($this->page->getMediaSetDefinition(), $this->page->getMediaSetDefinition()));
+            }, array_combine($mediaSet, $mediaSet));
 
             $data->clear();
             foreach ($types as $key => $item) {

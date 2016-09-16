@@ -22,15 +22,21 @@ class PageMediaSetService
      */
     private $repository;
 
-    public function __construct(PageMediaRepository $repository)
+    /**
+     * @var MediaSetDefinitionInterface
+     */
+    private $mediaSetDefinition;
+
+    public function __construct(PageMediaRepository $repository, MediaSetDefinitionInterface $mediaSetDefinition)
     {
         $this->repository = $repository;
+        $this->mediaSetDefinition = $mediaSetDefinition;
     }
 
     public function getPageMedia(HasMediaSetInterface $page, $name = null)
     {
         if (null === $name) {
-            list ($name) = $page->getMediaSetDefinition();
+            list ($name) = $this->mediaSetDefinition->getMediaSetDefinition($page);
         }
 
         $mediaSet = $this->getPageMediaSet($page);

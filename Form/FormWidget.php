@@ -3,16 +3,13 @@
 namespace ArsThanea\PageMediaSetBundle\Form;
 
 use ArsThanea\PageMediaSetBundle\Entity\PageMedia;
+use ArsThanea\PageMediaSetBundle\Service\HasMediaSetInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class FormWidget extends \Kunstmaan\AdminBundle\Helper\FormWidgets\FormWidget
 {
-    /**
-     * @var PageMediaCollectionAdminType
-     */
-    private $type;
     /**
      * @var Collection
      */
@@ -21,11 +18,15 @@ class FormWidget extends \Kunstmaan\AdminBundle\Helper\FormWidgets\FormWidget
      * @var PageMedia[]
      */
     private $toDelete;
+    /**
+     * @var HasMediaSetInterface
+     */
+    private $page;
 
-    public function __construct(PageMediaCollectionAdminType $type, Collection $mediaSet)
+    public function __construct(HasMediaSetInterface $page, Collection $mediaSet)
     {
-        parent::__construct(['media_set' => $type]);
-        $this->type = $type;
+        parent::__construct(['media_set' => PageMediaCollectionAdminType::class]);
+        $this->page = $page;
         $this->mediaSet = $mediaSet;
         $this->toDelete = $mediaSet->toArray();
     }
@@ -36,8 +37,9 @@ class FormWidget extends \Kunstmaan\AdminBundle\Helper\FormWidgets\FormWidget
      */
     public function buildForm(FormBuilderInterface $builder)
     {
-        $builder->add('media_set', $this->type, [
+        $builder->add('media_set', PageMediaCollectionAdminType::class, [
             'data' => $this->mediaSet,
+            'page' => $this->page,
         ]);
     }
 

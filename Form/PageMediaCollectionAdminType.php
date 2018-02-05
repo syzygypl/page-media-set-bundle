@@ -6,57 +6,57 @@ use ArsThanea\PageMediaSetBundle\Entity\PageMedia;
 use ArsThanea\PageMediaSetBundle\Service\HasMediaSetInterface;
 use ArsThanea\PageMediaSetBundle\Service\MediaSetDefinitionInterface;
 use ArsThanea\PageMediaSetBundle\Service\HasRichMediaInterface;
+use ArsThanea\PageMediaSetBundle\Service\MediaSetDefinitionService;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PageMediaCollectionAdminType extends AbstractType
 {
-    /**
-     * @var HasMediaSetInterface
-     */
-    private $page;
-
     /**
      * @var MediaSetDefinitionInterface
      */
     private $mediaSetDefinition;
 
-    public function __construct(HasMediaSetInterface $page, MediaSetDefinitionInterface $mediaSetDefinition)
+    public function __construct(MediaSetDefinitionInterface $mediaSetDefinition = null)
     {
-        $this->page = $page;
-        $this->mediaSetDefinition = $mediaSetDefinition;
+        $this->mediaSetDefinition = $mediaSetDefinition ?: new MediaSetDefinitionService([]); // TODO
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('page_media_set', 'collection', [
-            'label'        => false,
+        /** @var HasMediaSetInterface */
+        $page = $options['page'];
+
+
+        $builder->add('page_media_set', CollectionType::class, [
+            'label' => false,
             'allow_delete' => true,
-            'allow_add'    => false,
-            'type'         => PageMediaAdminType::class,
-            'options'      => [
-                'media_types' => $this->mediaSetDefinition->getMediaSetDefinition($this->page),
-                'images_only' => false === $this->page instanceof HasRichMediaInterface
+            'allow_add' => false,
+            'entry_type' => PageMediaAdminType::class,
+            'entry_options' => [
+                'media_types' => $this->mediaSetDefinition->getMediaSetDefinition($page),
+                'images_only' => false === $page instanceof HasRichMediaInterface
             ],
-            'attr'         => [
+            'attr' => [
                 'nested_form' => true,
             ],
         ]);
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($page) {
             /** @var Collection $data */
             $data = $event->getData();
 
-            $mediaSet = $this->mediaSetDefinition->getMediaSetDefinition($this->page);
+            $mediaSet = $this->mediaSetDefinition->getMediaSetDefinition($page);
 
-            $types = array_map(function ($type) use ($data) {
-                return $data->filter(function (PageMedia $element) use ($type) {
+            $types = array_map(function ($type) use ($data, $page) {
+                return $data->filter(function (PageMedia $element) use ($type, $page) {
                     return $type === $element->getType();
-                })->first() ? : (new PageMedia)->setType($type)->setPageId($this->page->getId())->setPageType($this->page->getType());
+                })->first() ? : (new PageMedia)->setType($type)->setPageId($page->getId())->setPageType($page->getType());
             }, array_combine($mediaSet, $mediaSet));
 
             $data->clear();
@@ -71,8 +71,10 @@ class PageMediaCollectionAdminType extends AbstractType
         });
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setRequired('page');
+        $resolver->setAllowedTypes('page', [HasMediaSetInterface::class]);
         $resolver->setDefaults([
             'data_class' => null,
         ]);

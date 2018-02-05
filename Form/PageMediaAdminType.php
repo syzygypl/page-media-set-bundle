@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PageMediaAdminType extends AbstractType
 {
@@ -29,7 +29,6 @@ class PageMediaAdminType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('media', MediaType::class, [
-            'pattern'   => 'KunstmaanMediaBundle_chooser',
             'mediatype' => $options['images_only'] ? 'image' : null,
             'required'  => true,
         ]);
@@ -65,21 +64,21 @@ class PageMediaAdminType extends AbstractType
                     'maxHeight' => $format->getMaxHeight(),
                 ])] : [],
             ];
-            $form->add('media', $builder->get('media')->getType()->getName(), $options + $builder->get('media')->getOptions());
+
+            $type = get_class($builder->get('media')->getFormConfig()->getType()->getInnerType());
+            $form->add('media', $type, $options + $builder->get('media')->getOptions());
 
         });
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => PageMedia::class,
             'images_only' => true,
         ]);
         $resolver->setRequired(['media_types']);
-        $resolver->setAllowedTypes([
-            'media_types' => ['array']
-        ]);
+        $resolver->setAllowedTypes('media_types', ['array']);
     }
 
 
